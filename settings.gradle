@@ -9,5 +9,5 @@ pluginManagement {
 	}
 }
 
-// Should match your modid
+// Should match the mod id in fabric.mod.json
 rootProject.name = 'endless_backrooms_delight'
