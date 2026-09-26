@@ -9,6 +9,29 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+
+	// Modrinth hosts the Endless Backrooms and Farmer's Delight Refabricated artifacts.
+	maven {
+		name = 'Modrinth'
+		url = 'https://api.modrinth.com/maven'
+		content {
+			includeGroup 'maven.modrinth'
+		}
+	}
+}
+
+// Runtime dependencies are read from libs/ when the jars are present there, and otherwise
+// resolved from the Modrinth maven repository. See libs/README.md.
+def localLibs = file('libs')
+
+def modDependency = { String fileName, String coordinates ->
+	def localJar = new File(localLibs, fileName)
+
+	if (localJar.isFile()) {
+		return files(localJar)
+	}
+
+	return "maven.modrinth:${coordinates}"
 }
 
 loom {
@@ -30,6 +53,14 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// Required dependencies of this mod. Both must also be declared in the "depends" block of
+	// fabric.mod.json so that the loader refuses to start without them.
+	// Endless Backrooms (https://modrinth.com/mod/endless_backrooms) - the dimension itself.
+	modImplementation modDependency('endless_backrooms-0.4.3.jar', "endless_backrooms:${project.endless_backrooms_version}")
+	// Farmer's Delight Refabricated (https://modrinth.com/mod/farmers-delight-refabricated) - the
+	// Fabric port of Farmer's Delight. The official Farmer's Delight is Forge/NeoForge only.
+	modImplementation modDependency('FarmersDelight-1.20.1-2.5.7+refabricated.jar', "farmers-delight-refabricated:${project.farmers_delight_version}")
 }
 
 processResources {

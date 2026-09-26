@@ -32,6 +32,10 @@ bin/
 
 run/
 
+# third-party mod jars kept locally for offline builds (see libs/README.md)
+libs/*
+!libs/README.md
+
 # java
 
 hs_err_*.log
