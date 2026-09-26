@@ -1,0 +1,20 @@
+{
+  "type": "farmersdelight:cooking",
+  "cookingtime": 200,
+  "experience": 1.0,
+  "ingredients": [
+    {
+      "item": "endless_backrooms:royal_rations"
+    },
+    {
+      "item": "endless_backrooms:moth_jelly"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ],
+  "recipe_book_tab": "meals",
+  "result": {
+    "item": "endless_backrooms_delight:royal_ration_stewed_moth_jelly"
+  }
+}
