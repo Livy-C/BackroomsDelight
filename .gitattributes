@@ -1,0 +1,15 @@
+#
+# https://help.github.com/articles/dealing-with-line-endings/
+#
+
+# Normalize all text files to LF in the repository and in the working tree, so that the
+# build behaves identically on Windows and on the Linux CI runner.
+*               text=auto eol=lf
+
+# These are Windows script files and must keep crlf in the working tree.
+# Declared after the catch-all so that it wins.
+*.bat           text eol=crlf
+
+# Ensure the icon and any other binary assets are never mangled by eol conversion
+*.png           binary
+*.jar           binary

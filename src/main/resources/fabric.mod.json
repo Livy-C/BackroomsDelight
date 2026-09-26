@@ -1,0 +1,32 @@
+{
+	"schemaVersion": 1,
+	"id": "endless_backrooms_delight",
+	"version": "${version}",
+	"name": "Endless Backrooms Delight",
+	"description": "Adds the Backrooms to Minecraft as an endless, procedurally generated space.",
+	"authors": [
+		"Livy-C"
+	],
+	"contact": {
+		"homepage": "https://github.com/Livy-C/BackroomsDelight",
+		"sources": "https://github.com/Livy-C/BackroomsDelight",
+		"issues": "https://github.com/Livy-C/BackroomsDelight/issues"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/endless_backrooms_delight/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"neo.livy.elbkrdelight.EndlessBackroomsDelight"
+		],
+		"client": [
+			"neo.livy.elbkrdelight.client.EndlessBackroomsDelightClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}
