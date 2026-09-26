@@ -9,6 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
@@ -48,6 +49,19 @@ public final class ModItems {
 	/** Chance the effect is applied, from 0.0 to 1.0. */
 	private static final float EFFECT_CHANCE = 1.0F;
 
+	/**
+	 * Saturation, matching what royal rations and moth jelly each grant. 15 seconds is the
+	 * duration moth jelly uses; royal rations uses a longer 120 seconds.
+	 */
+	private static final int SATURATION_DURATION_TICKS = 300;
+
+	/**
+	 * Moth pheromone, as granted by moth jelly. Endless Backrooms' deathmoths check this effect in
+	 * {@code DeathmothEntity.shouldIgnoreTarget} and refuse to attack the player while it is active,
+	 * so this is the "deathmoths leave you alone" buff, not a debuff.
+	 */
+	private static final int MOTH_PHEROMONE_DURATION_TICKS = 6000;
+
 	public static final Item ROYAL_RATION_STEWED_MOTH_JELLY;
 
 	static {
@@ -58,9 +72,33 @@ public final class ModItems {
 						.nutrition(NUTRITION)
 						.saturationMod(SATURATION_MODIFIER)
 						.effect(new MobEffectInstance(MobEffects.REGENERATION, EFFECT_DURATION_TICKS, EFFECT_AMPLIFIER), EFFECT_CHANCE)
+						.effect(new MobEffectInstance(MobEffects.SATURATION, SATURATION_DURATION_TICKS, 0), EFFECT_CHANCE)
+						.effect(new MobEffectInstance(mothPheromone(), MOTH_PHEROMONE_DURATION_TICKS, 0), EFFECT_CHANCE)
 						.build())
 				.stacksTo(16)
 				.craftRemainder(Items.BOWL));
+	}
+
+	/**
+	 * Looks up the moth pheromone effect from the registry instead of referencing
+	 * {@code ModEffects.MOTH_PHEROMONE} directly.
+	 *
+	 * <p>Endless Backrooms ships no sources, so compiling against its classes would bind this mod to
+	 * their exact internal layout. The mob effect registry is a stable, public contract, and the
+	 * effect is only read at runtime, after their initializer has registered it.
+	 *
+	 * @throws IllegalStateException if the effect is missing, which means the required
+	 *                               Endless Backrooms version is not the one this mod expects
+	 */
+	private static MobEffect mothPheromone() {
+		MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation("endless_backrooms", "moth_pheromone"));
+
+		if (effect == null) {
+			throw new IllegalStateException(
+					"Missing mob effect endless_backrooms:moth_pheromone - Endless Backrooms must be installed.");
+		}
+
+		return effect;
 	}
 
 	/** Farmer's Delight registers its creative tab under this id (see its {@code ModCreativeTabs}). */
