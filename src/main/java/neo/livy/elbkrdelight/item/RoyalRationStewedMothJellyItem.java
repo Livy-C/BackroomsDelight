@@ -54,10 +54,12 @@ public class RoyalRationStewedMothJellyItem extends Item {
 	 * because Endless Backrooms ships no sources and compiling against its internal classes would be
 	 * fragile.
 	 *
-	 * <p>Candidates are offered from the highest amplifier down, and the first one the entity
-	 * actually accepts wins. This mirrors the ingredients exactly: vanilla only merges an incoming
-	 * instance when it is strictly stronger than the active one, so offering the highest candidate
-	 * first is what lets an existing, stronger withdrawal survive while a weaker one is upgraded.
+	 * <p>1.20.1's {@code addEffect} returns a boolean and gives no way to read back what stuck, so
+	 * candidates are offered from the highest amplifier down and the first one that is rejected ends
+	 * the search; the accepted one is already in place by then. Vanilla only merges an incoming
+	 * instance when it is strictly stronger than the active one, which is why offering the highest
+	 * candidate first reproduces the ingredients' exact upgrade behaviour: a weaker candidate cannot
+	 * downgrade an existing, stronger withdrawal.
 	 */
 	private static void applyWithdrawal(LivingEntity entity) {
 		MobEffect withdrawal = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation("endless_backrooms", "withdrawal"));
@@ -71,10 +73,7 @@ public class RoyalRationStewedMothJellyItem extends Item {
 		int nextAmplifier = current == null ? 0 : Math.min(current.getAmplifier() + 1, WITHDRAWAL_MAX_AMPLIFIER);
 
 		for (int amplifier = nextAmplifier; amplifier >= 0; amplifier--) {
-			MobEffectInstance candidate = new MobEffectInstance(withdrawal, WITHDRAWAL_DURATION_TICKS, amplifier);
-			MobEffectInstance applied = entity.addEffect(candidate);
-
-			if (applied != null && applied.getAmplifier() == amplifier) {
+			if (!entity.addEffect(new MobEffectInstance(withdrawal, WITHDRAWAL_DURATION_TICKS, amplifier))) {
 				return;
 			}
 		}
