@@ -17,15 +17,11 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
-import vectorwing.farmersdelight.common.item.ConsumableItem;
-
 /**
  * Registers this mod's items.
  *
- * <p>The stew extends Farmer's Delight's {@code ConsumableItem}, the base class of every bowl food
- * in that mod. That class hands the bowl back by reading the recipe remainder of the stack, so
- * {@code craftRemainder(Items.BOWL)} is what makes the bowl survive being eaten. Reusing it keeps
- * the eating animation, use duration and tooltip behaviour identical to the Farmer's Delight soups.
+ * <p>{@link RoyalRationStewedMothJellyItem} handles the stew's own behaviour, including the bowl
+ * return and the withdrawal effect it shares with its ingredients.
  */
 public final class ModItems {
 	/**
@@ -62,12 +58,12 @@ public final class ModItems {
 	 */
 	private static final int MOTH_PHEROMONE_DURATION_TICKS = 6000;
 
-	public static final Item ROYAL_RATION_STEWED_MOTH_JELLY;
+	public static final RoyalRationStewedMothJellyItem ROYAL_RATION_STEWED_MOTH_JELLY;
 
 	static {
 		// 1.20.1 Item.Properties is consumed by the Item constructor and cannot be applied
 		// afterwards, so the properties are built here and passed straight in.
-		ROYAL_RATION_STEWED_MOTH_JELLY = new ConsumableItem(new Item.Properties()
+		ROYAL_RATION_STEWED_MOTH_JELLY = new RoyalRationStewedMothJellyItem(new Item.Properties()
 				.food(new FoodProperties.Builder()
 						.nutrition(NUTRITION)
 						.saturationMod(SATURATION_MODIFIER)
