@@ -1,0 +1,17 @@
+{
+  "type": "farmersdelight:cooking",
+  "cookingtime": 200,
+  "experience": 1.0,
+  "ingredients": [
+    {
+      "tag": "c:crops/carrot"
+    },
+    {
+      "item": "endless_backrooms:blue_almond_water"
+    }
+  ],
+  "recipe_book_tab": "meals",
+  "result": {
+    "item": "endless_backrooms_delight:carrot_blue_almond_water_stew"
+  }
+}

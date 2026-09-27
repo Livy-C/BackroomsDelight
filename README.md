@@ -128,31 +128,48 @@ page for your IDE.
 
 ## Content
 
-Two cooking pot meals, both bowl foods that stack to 16 and leave an empty bowl behind. Their
-definitions live in one place, the `MEALS` list in `ModItems`.
+Four items. The three bowl meals stack to 16 and leave an empty bowl behind; fried carpet is a
+hand-held snack with nothing left over. Meal definitions live in one place, the `MEALS` list in
+`ModItems`.
 
-| Item                            | Recipe                                                                     | Nutrition | Effects                                        |
-| ------------------------------- | -------------------------------------------------------------------------- | --------- | ---------------------------------------------- |
-| Royal Ration Stewed Moth Jelly  | royal rations + moth jelly + sugar                                          | 30        | Regeneration II 10s, Saturation 15s, Moth Pheromone 5min |
-| Dried Shrimp Mushroom Stew      | raw scit + mushroom + almond water + onion                                  | 14        | Regeneration II 10s, Saturation 15s             |
+| Item                             | Made in        | Recipe                                              | Nutrition | Effects                                                   |
+| -------------------------------- | -------------- | --------------------------------------------------- | --------- | --------------------------------------------------------- |
+| Royal Ration Stewed Moth Jelly   | cooking pot    | royal rations + moth jelly + sugar                   | 30        | Regeneration II 10s, Saturation 15s, Moth Pheromone 5min   |
+| Dried Shrimp Mushroom Stew       | cooking pot    | raw scit + mushroom + almond water + onion           | 14        | Regeneration II 10s, Saturation 15s                        |
+| Carrot Blue Almond Water Stew    | cooking pot    | carrot + blue almond water                           | 12        | Night Vision 3min                                          |
+| Fried Carpet                     | skillet        | Level 0 carpet                                       | 4         | none - it is a greasy snack, not a meal                    |
 
-Both are addictive, matching Endless Backrooms' own royal rations and moth jelly: every serving
-raises the withdrawal amplifier one step, capped, and refreshes its duration. The royal version
-uses a 6 minute withdrawal capped at IV (royal rations' values); the shrimp version uses 3 minutes
-capped at III, since it is the milder meal.
+All four are addictive, matching Endless Backrooms' own royal rations and moth jelly: every serving
+raises the withdrawal amplifier one step, capped, and refreshes its duration.
+
+| Item                            | Withdrawal duration | Cap |
+| ------------------------------- | ------------------- | --- |
+| Royal Ration Stewed Moth Jelly  | 6 minutes           | IV  |
+| Dried Shrimp Mushroom Stew      | 3 minutes           | III |
+| Carrot Blue Almond Water Stew   | 3 minutes           | III |
+| Fried Carpet                    | 90 seconds          | II  |
+
+The royal version uses royal rations' own values; the milder items use shorter, lower-capped ones.
 Moth Pheromone is a *buff*: Endless Backrooms' deathmoths check it in `DeathmothEntity.shouldIgnoreTarget`
 and refuse to attack the player while it is active. Only the royal version grants it, because moth
 jelly is one of its ingredients.
+
+Food effects are listed in each item's tooltip, the way Farmer's Delight does it, via
+`FoodEffectTooltip`. That is needed because vanilla only renders those lines for a few hard-coded
+items.
+
+The skillet is not a recipe type in Farmer's Delight; it is a hand-held tool that cooks vanilla
+campfire recipes, which is why Fried Carpet uses `minecraft:campfire_cooking`.
 
 > Vanilla clamps the player's food level to 20 (`Math.min` in `FoodData.eat`), so the royal
 > version's 30 nutrition is partly wasted when eaten from low hunger; the extra shows up as
 > saturation instead, which is clamped separately.
 
-Textures live in this mod's own assets folder under `textures/item/`. The royal version has its
-own art, `royal_ration_stewed_moth_jelly.png`. The shrimp version still points at
-`endless_backrooms_delight:item/mushroom_stew`, a copy of the vanilla mushroom stew texture that is
-serving as a placeholder; replace that file or repoint its model's `layer0` when real art is ready.
-Both are 16x16.
+Textures live in this mod's own assets folder under `textures/item/`. The royal version has its own
+art, `royal_ration_stewed_moth_jelly.png`, and Fried Carpet uses a copy of Level 0's carpet texture.
+The two remaining stews point at `endless_backrooms_delight:item/mushroom_stew`, a copy of the
+vanilla mushroom stew texture serving as a placeholder; replace that file or repoint their models'
+`layer0` when real art is ready. All are 16x16.
 
 ## Layout
 
