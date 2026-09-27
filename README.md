@@ -165,11 +165,17 @@ campfire recipes, which is why Fried Carpet uses `minecraft:campfire_cooking`.
 > version's 30 nutrition is partly wasted when eaten from low hunger; the extra shows up as
 > saturation instead, which is clamped separately.
 
-Textures live in this mod's own assets folder under `textures/item/`. The royal version has its own
-art, `royal_ration_stewed_moth_jelly.png`, and Fried Carpet uses a copy of Level 0's carpet texture.
-The two remaining stews point at `endless_backrooms_delight:item/mushroom_stew`, a copy of the
-vanilla mushroom stew texture serving as a placeholder; replace that file or repoint their models'
-`layer0` when real art is ready. All are 16x16.
+Textures live in this mod's own assets folder under `textures/item/`, one file per item, so real art
+can be dropped in by overwriting a single file without touching any model. The royal version has its
+own art (`royal_ration_stewed_moth_jelly.png`) and Fried Carpet reuses a copy of Level 0's carpet
+texture. The two remaining stews currently hold a copy of the vanilla mushroom stew texture as a
+placeholder. All are 16x16.
+
+## Adding more content
+
+[`docs/ingredients.md`](docs/ingredients.md) catalogues what vanilla, Endless Backrooms and Farmer's
+Delight offer as ingredients, including which tags to prefer over hard-coded item ids — a tag makes
+one recipe accept a whole category of items, which is what Farmer's Delight itself does.
 
 ## Layout
 

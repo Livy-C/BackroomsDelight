@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "endless_backrooms_delight:item/mushroom_stew"
+    "layer0": "endless_backrooms_delight:item/carrot_blue_almond_water_stew"
   }
 }
