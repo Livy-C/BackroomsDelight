@@ -3,6 +3,32 @@ plugins {
 	id 'maven-publish'
 }
 
+// Fabric Loom 1.17 needs a Java 21+ runtime. The build's *launcher* JVM is the one JAVA_HOME
+// points at, so this block only helps the compile/test toolchains pick 21 when JAVA_HOME is an
+// older JDK; it cannot rescue a Java 17 launcher, because the plugin classpath is resolved before
+// any of this build script runs. See the "Development" section of README.md.
+// If auto-detection does not find a JDK 21, set java21_home in gradle.properties.
+def java21Home = providers.gradleProperty('java21_home').getOrElse('')
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+
+		if (java21Home) {
+			// Explicit override, e.g. java21_home=D:\\Java\\temurin-21
+			def installation = new File(java21Home)
+			def executables = [new File(installation, 'bin/java.exe'), new File(installation, 'bin/java')]
+					.findAll { it.isFile() }
+
+			if (executables.isEmpty()) {
+				throw new GradleException("java21_home is set to '${java21Home}', but no bin/java was found there.")
+			}
+
+			installationPath = installation
+		}
+	}
+}
+
 repositories {
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
@@ -34,6 +60,29 @@ def modDependency = { String fileName, String coordinates ->
 	return "maven.modrinth:${coordinates}"
 }
 
+// Farmer's Delight Refabricated needs Porting Lib, and its own static initializer needs the recipe
+// book category that Porting Lib's mixin adds. Porting Lib ships as an umbrella jar full of nested
+// jars, and Loom does not load nested jars for modImplementation dependencies
+// (FabricMC/fabric-loom#1275). In a development environment that leaves Porting Lib's mixins
+// unapplied, so Farmer's Delight crashes on startup with
+// "No enum constant RecipeBookType.FARMERSDELIGHT_COOKING".
+//
+// Production is unaffected: the real loader does unpack nested jars and applies the mixins.
+//
+// To make the development environment work, the nested modules are unpacked into libs/ and added
+// here. Any jar dropped into libs/ is picked up, so no module list has to be maintained.
+// See libs/README.md for how to produce them.
+def unpackedModJars = fileTree(localLibs) {
+	include '*.jar'
+	exclude 'endless_backrooms-*.jar'
+	exclude 'FarmersDelight-*.jar'
+	exclude 'porting_lib-*.jar'
+}
+
+if (!unpackedModJars.isEmpty()) {
+	logger.lifecycle("Adding ${unpackedModJars.files.size()} unpacked mod jar(s) from libs/ (Porting Lib workaround)")
+}
+
 loom {
 	splitEnvironmentSourceSets()
 
@@ -61,6 +110,11 @@ dependencies {
 	// Farmer's Delight Refabricated (https://modrinth.com/mod/farmers-delight-refabricated) - the
 	// Fabric port of Farmer's Delight. The official Farmer's Delight is Forge/NeoForge only.
 	modImplementation modDependency('FarmersDelight-1.20.1-2.5.7+refabricated.jar', "farmers-delight-refabricated:${project.farmers_delight_version}")
+
+	// Unpacked Porting Lib modules; runtime only, because nothing in this mod compiles against them.
+	if (!unpackedModJars.isEmpty()) {
+		modLocalRuntime files(unpackedModJars.files)
+	}
 }
 
 processResources {
