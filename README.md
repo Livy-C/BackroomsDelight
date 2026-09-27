@@ -128,28 +128,38 @@ page for your IDE.
 
 ## Content
 
-Five items. The four bowl meals stack to 16 and leave an empty bowl behind; fried carpet is a
+Seven items. Six are bowl meals that stack to 16 and leave an empty bowl behind; fried carpet is a
 hand-held snack with nothing left over. Meal definitions live in one place, the `MEALS` list in
 `ModItems`.
 
-| Item                             | Made in        | Recipe                                                        | Nutrition | Effects                                                    |
-| -------------------------------- | -------------- | ------------------------------------------------------------- | --------- | ---------------------------------------------------------- |
-| Royal Ration Stewed Moth Jelly   | cooking pot    | royal rations + moth jelly + sugar                             | 30        | Regeneration II 10s, Saturation 15s, Moth Pheromone 5min    |
-| Dark Stew                        | cooking pot    | corruption liquid + almond water + carpet + wallpaper + onion + minced beef | 16 | Regeneration II 10s, Saturation 15s, **Darkness 15s**, **Nausea 10s** |
-| Dried Shrimp Mushroom Stew       | cooking pot    | raw scit + mushroom stew + almond water + onion                 | 14        | Regeneration II 10s, Saturation 15s                         |
-| Carrot Blue Almond Water Stew    | cooking pot    | carrot + blue almond water                                     | 12        | Night Vision 3min                                           |
-| Fried Carpet                     | skillet        | Level 0 carpet                                                 | 4         | none - it is a greasy snack, not a meal                     |
+| Item                             | Made in          | Recipe                                                        | Nutrition | Effects                                                    |
+| -------------------------------- | ---------------- | ------------------------------------------------------------- | --------- | ---------------------------------------------------------- |
+| Royal Ration Stewed Moth Jelly   | cooking pot      | royal rations + moth jelly + sugar                             | 30        | Regeneration II 10s, Saturation 15s, Moth Pheromone 5min    |
+| Dried Shrimp Pie                 | crafting table   | cooked scit + onion + ham + minced beef + egg + pie crust      | 20        | Regeneration II 10s, Saturation 15s                         |
+| Dried Shrimp Stew over Rice      | cooking pot      | cooked scit + almond water + onion + cooked rice + ham + potato | 18       | Regeneration II 10s, Saturation 15s                         |
+| Dark Stew                        | cooking pot      | corruption liquid + almond water + carpet + wallpaper + onion + minced beef | 16 | Regeneration II 10s, Saturation 15s, **Darkness 15s**, **Nausea 10s**, **Wretched Cycle 2min** |
+| Dried Shrimp Mushroom Stew       | cooking pot      | raw scit + mushroom stew + almond water + onion                | 14        | Regeneration II 10s, Saturation 15s                         |
+| Carrot Blue Almond Water Stew    | cooking pot      | carrot + blue almond water                                     | 12        | Night Vision 3min                                           |
+| Fried Carpet                     | skillet          | Level 0 carpet                                                 | 4         | none - it is a greasy snack, not a meal                     |
 
-Dark Stew is the one genuine trade in the set: six ingredients, the highest nutrition here, and it
-then takes your sight away for fifteen seconds. It is the only item that inflicts a debuff.
+Dried Shrimp Pie is the only item made on a crafting table rather than cooked, matching how Farmer's
+Delight makes all of its pies: a shaped recipe with the pie crust at the bottom centre.
 
-All five are addictive, matching Endless Backrooms' own royal rations and moth jelly: every serving
+Dark Stew is the one genuine trade in the set. Six ingredients, high nutrition, and then it takes
+your sight away for fifteen seconds and inflicts **Wretched Cycle** for two minutes. That effect is
+Endless Backrooms' own punishment: every second it teleports you back to where you were and spawns a
+hostile wretch, and notably that mod's own almond water deliberately refuses to cure it. It is the
+only item that inflicts a debuff.
+
+All seven are addictive, matching Endless Backrooms' own royal rations and moth jelly: every serving
 raises the withdrawal amplifier one step, capped, and refreshes its duration.
 
 | Item                            | Withdrawal duration | Cap |
 | ------------------------------- | ------------------- | --- |
 | Royal Ration Stewed Moth Jelly  | 6 minutes           | IV  |
 | Dark Stew                       | 6 minutes           | IV  |
+| Dried Shrimp Pie                | 3 minutes           | III |
+| Dried Shrimp Stew over Rice     | 3 minutes           | III |
 | Dried Shrimp Mushroom Stew      | 3 minutes           | III |
 | Carrot Blue Almond Water Stew   | 3 minutes           | III |
 | Fried Carpet                    | 90 seconds          | II  |

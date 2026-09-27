@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "endless_backrooms_delight:item/dried_shrimp_rice_bowl"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "endless_backrooms_delight_dried_shrimp_pie",
+  "key": {
+    "O": {
+      "item": "farmersdelight:pie_crust"
+    },
+    "c": {
+      "item": "endless_backrooms:cooked_scit"
+    },
+    "n": {
+      "tag": "c:crops/onion"
+    },
+    "h": {
+      "item": "farmersdelight:ham"
+    },
+    "b": {
+      "item": "farmersdelight:minced_beef"
+    },
+    "e": {
+      "tag": "c:eggs"
+    }
+  },
+  "pattern": [
+    "cnh",
+    "beb",
+    " O "
+  ],
+  "result": {
+    "item": "endless_backrooms_delight:dried_shrimp_pie"
+  },
+  "show_notification": true
+}
