@@ -44,6 +44,15 @@ repositories {
 			includeGroup 'maven.modrinth'
 		}
 	}
+
+	// JEI is published by its author here, not on Modrinth's maven.
+	maven {
+		name = 'BlameJared'
+		url = 'https://maven.blamejared.com'
+		content {
+			includeGroup 'mezz.jei'
+		}
+	}
 }
 
 // Runtime dependencies are read from libs/ when the jars are present there, and otherwise
@@ -67,6 +76,9 @@ def modDependency = { String fileName, String coordinates ->
 // unapplied, so Farmer's Delight crashes on startup with
 // "No enum constant RecipeBookType.FARMERSDELIGHT_COOKING".
 //
+// AppleSkin has the same problem with its nested Cloth Config, which is why the extracted jars
+// below cover both. See libs/README.md.
+//
 // Production is unaffected: the real loader does unpack nested jars and applies the mixins.
 //
 // To make the development environment work, the nested modules are unpacked into libs/ and added
@@ -77,6 +89,9 @@ def unpackedModJars = fileTree(localLibs) {
 	exclude 'endless_backrooms-*.jar'
 	exclude 'FarmersDelight-*.jar'
 	exclude 'porting_lib-*.jar'
+	// AppleSkin's own jar, which is resolved as a dependency; only its nested Cloth Config belongs
+	// in this set.
+	exclude 'appleskin-*.jar'
 }
 
 if (!unpackedModJars.isEmpty()) {
@@ -115,6 +130,16 @@ dependencies {
 	if (!unpackedModJars.isEmpty()) {
 		modLocalRuntime files(unpackedModJars.files)
 	}
+
+	// Development-quality-of-life mods. modLocalRuntime means they load in runClient/runServer but
+	// are never bundled into the published jar and are not required at runtime, so they stay out of
+	// the "depends" block in fabric.mod.json.
+	// JEI is what makes the cooking pot recipe browsable while developing; Farmer's Delight ships a
+	// JEI plugin, and 15.21.0.148 is the version it compiles against.
+	modLocalRuntime "mezz.jei:jei-1.20.1-fabric:${project.jei_version}"
+	// AppleSkin shows the hunger and saturation our stew restores, which is the whole point of it
+	// being a food item. Resolved from the Modrinth maven repository.
+	modLocalRuntime "maven.modrinth:appleskin:${project.appleskin_version}"
 }
 
 processResources {

@@ -71,22 +71,37 @@ to point at one — `build.gradle` validates the path and says so if it is wrong
 ./gradlew runServer      # launch a development server
 ```
 
-Before the first `runClient`, unpack Farmer's Delight's Porting Lib dependency:
+Before the first `runClient`, unpack the nested dependencies:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools/unpack-porting-lib.ps1
+powershell -ExecutionPolicy Bypass -File tools/unpack-nested-deps.ps1
 ```
 
 Without it, the game dies during startup with
 `No enum constant RecipeBookType.FARMERSDELIGHT_COOKING`. This is a Loom limitation, not a mistake
 in your setup, and it does **not** affect production — see [libs/README.md](libs/README.md) for the
-full explanation.
+full explanation. The same thing bites AppleSkin, which bundles Cloth Config the same way and fails
+without it on `NoClassDefFoundError: me/shedaniel/autoconfig/ConfigData`.
 
 `runServer` additionally cannot work with this dependency set: Porting Lib registers its recipe
 book category through a **client-only** mixin, while Farmer's Delight's initializer reads that
 enum on both sides. The server therefore fails the same way even with Porting Lib unpacked. Use
 `runClient` for development, and note that a dedicated server needs a different Farmer's Delight
 or Porting Lib build.
+
+### Development-only mods
+
+JEI and AppleSkin load in `runClient`/`runServer` but are not required at runtime and are not
+bundled into the built jar, so they are declared as `modLocalRuntime` and deliberately kept out of
+the `depends` block in `fabric.mod.json`. Their versions live in `gradle.properties`
+(`jei_version`, `appleskin_version`).
+
+```sh
+./gradlew runClient
+```
+
+Then search `royal_ration` in JEI to see the cooking pot recipe, and check the hunger bar preview
+from AppleSkin to see what the stew restores.
 
 The built jar is written to `build/libs/`.
 

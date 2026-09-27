@@ -112,3 +112,28 @@ if ($fdJar) {
 Write-Output ""
 Write-Output "Done. libs/ now holds $((Get-ChildItem $OutDir -Filter '*.jar').Count) jars."
 Write-Output "These are gitignored; re-run this script after a fresh clone."
+
+# 5. AppleSkin bundles Cloth Config the same way, so unpack that too
+Write-Output ""
+Write-Output "Unpacking AppleSkin's nested jars ..."
+$appleskinJar = Get-ChildItem (Join-Path $env:USERPROFILE '.gradle\caches\modules-2\files-2.1\maven.modrinth\appleskin') -Recurse -Filter '*.jar' -ErrorAction SilentlyContinue |
+		Where-Object { $_.Name -notmatch 'sources' } | Select-Object -First 1
+
+if ($appleskinJar) {
+	$zip = [System.IO.Compression.ZipFile]::OpenRead($appleskinJar.FullName)
+	$found = 0
+	try {
+		foreach ($entry in $zip.Entries) {
+			if ($entry.FullName -match '^META-INF/jars/(.+\.jar)$') {
+				$name = $Matches[1]
+				[System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $OutDir $name), $true)
+				Write-Output "  unpacked $name"
+				$found++
+			}
+		}
+	} finally { $zip.Dispose() }
+	if ($found -eq 0) { Write-Output "  nothing nested" }
+} else {
+	Write-Output "Note: AppleSkin jar not in the Gradle cache yet, skipped."
+	Write-Output "      Run a build once, then run this script again."
+}
