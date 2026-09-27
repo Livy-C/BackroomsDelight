@@ -10,34 +10,32 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
- * The stew item.
+ * A bowl food that leaves an empty bowl behind and is addictive, matching Endless Backrooms' own
+ * royal rations and moth jelly.
  *
  * <p>Extends plain {@link Item} rather than Farmer's Delight's {@code ConsumableItem}: the bowl
- * comes back through {@code craftRemainder(Items.BOWL)}, which vanilla honours in
- * {@code LivingEntity.eat} and therefore in {@link Item#finishUsingItem}, so the mod-owned class
- * avoids depending on Farmer's Delight's config for tooltip behaviour.
- *
- * <p>Addiction follows Endless Backrooms' own royal rations and moth jelly: every serving raises
- * the withdrawal amplifier by one, up to a cap, and refreshes its duration. Royal rations use a
- * 6 minute withdrawal and moth jelly a 3 minute one, so this uses the longer, matching the royal
- * rations the dish is built around.
+ * comes back through {@code craftRemainder(Items.BOWL)}, which vanilla already honours in
+ * {@code LivingEntity.eat} and therefore in {@link Item#finishUsingItem}, so this avoids depending
+ * on Farmer's Delight's config for tooltip behaviour.
  */
-public class RoyalRationStewedMothJellyItem extends Item {
-	/** Withdrawal duration in ticks (7200 = 6 minutes, same as royal rations). */
-	private static final int WITHDRAWAL_DURATION_TICKS = 7200;
+public class AddictiveBowlFoodItem extends Item {
+	/** How long the withdrawal lasts after eating, in ticks. */
+	private final int withdrawalDurationTicks;
 
-	/** Highest withdrawal amplifier this can build up to, matching the ingredients' cap of IV. */
-	private static final int WITHDRAWAL_MAX_AMPLIFIER = 3;
+	/** Highest withdrawal amplifier this item can build up to. */
+	private final int withdrawalMaxAmplifier;
 
-	public RoyalRationStewedMothJellyItem(Properties properties) {
+	public AddictiveBowlFoodItem(Properties properties, int withdrawalDurationTicks, int withdrawalMaxAmplifier) {
 		super(properties);
+		this.withdrawalDurationTicks = withdrawalDurationTicks;
+		this.withdrawalMaxAmplifier = withdrawalMaxAmplifier;
 	}
 
 	@Override
 	public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-		// Applies the FoodProperties effects (regeneration, saturation, moth pheromone) and returns
-		// the empty bowl through the recipe remainder. Must run first: the food effects are applied
-		// by LivingEntity.eat, which only the superclass call reaches.
+		// Applies the FoodProperties effects and returns the empty bowl through the recipe
+		// remainder. Must run first: the food effects are applied by LivingEntity.eat, which only
+		// the superclass call reaches.
 		ItemStack result = super.finishUsingItem(stack, level, entity);
 
 		if (!level.isClientSide) {
@@ -61,7 +59,7 @@ public class RoyalRationStewedMothJellyItem extends Item {
 	 * candidate first reproduces the ingredients' exact upgrade behaviour: a weaker candidate cannot
 	 * downgrade an existing, stronger withdrawal.
 	 */
-	private static void applyWithdrawal(LivingEntity entity) {
+	private void applyWithdrawal(LivingEntity entity) {
 		MobEffect withdrawal = BuiltInRegistries.MOB_EFFECT.get(new ResourceLocation("endless_backrooms", "withdrawal"));
 
 		if (withdrawal == null) {
@@ -70,10 +68,12 @@ public class RoyalRationStewedMothJellyItem extends Item {
 		}
 
 		MobEffectInstance current = entity.getEffect(withdrawal);
-		int nextAmplifier = current == null ? 0 : Math.min(current.getAmplifier() + 1, WITHDRAWAL_MAX_AMPLIFIER);
+		int nextAmplifier = current == null
+				? 0
+				: Math.min(current.getAmplifier() + 1, withdrawalMaxAmplifier);
 
 		for (int amplifier = nextAmplifier; amplifier >= 0; amplifier--) {
-			if (!entity.addEffect(new MobEffectInstance(withdrawal, WITHDRAWAL_DURATION_TICKS, amplifier))) {
+			if (!entity.addEffect(new MobEffectInstance(withdrawal, withdrawalDurationTicks, amplifier))) {
 				return;
 			}
 		}

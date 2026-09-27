@@ -100,13 +100,39 @@ the `depends` block in `fabric.mod.json`. Their versions live in `gradle.propert
 ./gradlew runClient
 ```
 
-Then search `royal_ration` in JEI to see the cooking pot recipe, and check the hunger bar preview
-from AppleSkin to see what the stew restores.
+Then search the item names in JEI to see the cooking pot recipes, and check the hunger bar preview
+from AppleSkin to see what each meal restores.
 
 The built jar is written to `build/libs/`.
 
 For IDE setup instructions, see the [Fabric Documentation](https://docs.fabricmc.net/develop/getting-started/creating-a-project#setting-up)
 page for your IDE.
+
+## Content
+
+Two cooking pot meals, both bowl foods that stack to 16 and leave an empty bowl behind. Their
+definitions live in one place, the `MEALS` list in `ModItems`.
+
+| Item                            | Recipe                                                                     | Nutrition | Effects                                        |
+| ------------------------------- | -------------------------------------------------------------------------- | --------- | ---------------------------------------------- |
+| Royal Ration Stewed Moth Jelly  | royal rations + moth jelly + sugar                                          | 30        | Regeneration II 10s, Saturation 15s, Moth Pheromone 5min |
+| Dried Shrimp Mushroom Stew      | raw scit + mushroom + almond water + onion                                  | 14        | Regeneration II 10s, Saturation 15s             |
+
+Both are addictive, matching Endless Backrooms' own royal rations and moth jelly: every serving
+raises the withdrawal amplifier one step, capped, and refreshes its duration. The royal version
+uses a 6 minute withdrawal capped at IV (royal rations' values); the shrimp version uses 3 minutes
+capped at III, since it is the milder meal.
+Moth Pheromone is a *buff*: Endless Backrooms' deathmoths check it in `DeathmothEntity.shouldIgnoreTarget`
+and refuse to attack the player while it is active. Only the royal version grants it, because moth
+jelly is one of its ingredients.
+
+> Vanilla clamps the player's food level to 20 (`Math.min` in `FoodData.eat`), so the royal
+> version's 30 nutrition is partly wasted when eaten from low hunger; the extra shows up as
+> saturation instead, which is clamped separately.
+
+Item textures are placeholders: both models point at `endless_backrooms_delight:item/mushroom_stew`,
+a copy of the vanilla mushroom stew texture living in this mod's own assets folder. Replace that
+file, or repoint each model's `layer0`, when real art is ready.
 
 ## Layout
 

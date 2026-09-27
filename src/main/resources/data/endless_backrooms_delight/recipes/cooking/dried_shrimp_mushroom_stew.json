@@ -1,0 +1,23 @@
+{
+  "type": "farmersdelight:cooking",
+  "cookingtime": 200,
+  "experience": 1.0,
+  "ingredients": [
+    {
+      "item": "endless_backrooms:raw_scit"
+    },
+    {
+      "tag": "c:mushrooms"
+    },
+    {
+      "tag": "endless_backrooms:almond_water"
+    },
+    {
+      "tag": "c:crops/onion"
+    }
+  ],
+  "recipe_book_tab": "meals",
+  "result": {
+    "item": "endless_backrooms_delight:dried_shrimp_mushroom_stew"
+  }
+}

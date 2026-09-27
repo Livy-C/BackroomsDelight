@@ -1,5 +1,8 @@
 package neo.livy.elbkrdelight.item;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import neo.livy.elbkrdelight.EndlessBackroomsDelight;
 
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
@@ -21,59 +24,62 @@ import net.minecraft.world.item.Items;
 /**
  * Registers this mod's items.
  *
- * <p>The stew is built lazily, once Endless Backrooms has actually put its moth pheromone effect
- * into the registry. That mod registers through Porting Lib's {@code LazyRegistrar}, which defers
- * the real registration, so its effects do not exist yet while this mod's initializer runs.
- * Building the item's food properties eagerly therefore fails at class-initialisation time; waiting
- * for the registry callback is what makes the pheromone effect resolvable.
+ * <p>The meals are built lazily, once Endless Backrooms has actually put its effects into the
+ * registry. That mod registers through Porting Lib's {@code LazyRegistrar}, which defers the real
+ * registration, so its effects do not exist yet while this mod's initializer runs.
  */
 public final class ModItems {
-	/**
-	 * Hunger points this meal tries to restore.
-	 *
-	 * <p>Note that vanilla clamps the player's food level to 20, so anything above 20 is wasted:
-	 * eating this at zero hunger still leaves the player at 20. The value is kept at the requested
-	 * 30 anyway, and the bonus shows up as saturation instead, which is clamped separately.
-	 */
-	private static final int NUTRITION = 30;
-
-	/** Saturation multiplier; saturation gained is {@code nutrition * this * 2}. */
-	private static final float SATURATION_MODIFIER = 0.9F;
-
-	/** How long the regeneration lasts, in ticks (20 ticks = 1 second). */
-	private static final int EFFECT_DURATION_TICKS = 200;
+	/** Regen duration in ticks (20 ticks = 1 second). */
+	private static final int REGEN_TICKS = 200;
 
 	/** Regeneration amplifier: 0 is level I, 1 is level II. */
-	private static final int EFFECT_AMPLIFIER = 1;
+	private static final int REGEN_AMPLIFIER = 1;
 
-	/** Chance the effects are applied, from 0.0 to 1.0. */
-	private static final float EFFECT_CHANCE = 1.0F;
-
-	/**
-	 * Saturation, matching what royal rations and moth jelly each grant. 15 seconds is the duration
-	 * moth jelly uses; royal rations uses a longer 120 seconds.
-	 */
-	private static final int SATURATION_DURATION_TICKS = 300;
+	/** Saturation duration, matching moth jelly. Royal rations uses a longer 120 seconds. */
+	private static final int SATURATION_TICKS = 300;
 
 	/**
 	 * Moth pheromone, as granted by moth jelly. Endless Backrooms' deathmoths check this effect in
 	 * {@code DeathmothEntity.shouldIgnoreTarget} and refuse to attack the player while it is active,
 	 * so this is the "deathmoths leave you alone" buff, not a debuff.
 	 */
-	private static final int MOTH_PHEROMONE_DURATION_TICKS = 6000;
+	private static final int MOTH_PHEROMONE_TICKS = 6000;
+
+	/** Chance the effects are applied, from 0.0 to 1.0. */
+	private static final float EFFECT_CHANCE = 1.0F;
 
 	private static final ResourceLocation MOTH_PHEROMONE_ID =
 			new ResourceLocation("endless_backrooms", "moth_pheromone");
-
-	private static final String ITEM_PATH = "royal_ration_stewed_moth_jelly";
 
 	/** Farmer's Delight registers its creative tab under this id (see its {@code ModCreativeTabs}). */
 	private static final ResourceKey<CreativeModeTab> FARMERS_DELIGHT_TAB = ResourceKey.create(
 			Registries.CREATIVE_MODE_TAB,
 			new ResourceLocation("farmersdelight", "farmersdelight"));
 
-	/** Null until Endless Backrooms has registered the moth pheromone effect. */
-	private static Item royalRationStewedMothJelly;
+	/**
+	 * Every meal this mod adds.
+	 *
+	 * <p>Note that vanilla clamps the player's food level to 20, so nutrition above 20 is partly
+	 * wasted; the remainder shows up as saturation, which is clamped separately.
+	 */
+	private static final List<Meal> MEALS = List.of(
+			// Royal rations + moth jelly + sugar. The strongest of the two, and the only one that
+			// grants moth pheromone, because moth jelly is one of its ingredients.
+			new Meal(
+					"royal_ration_stewed_moth_jelly",
+					30, 0.9F,
+					true,
+					7200, 3),
+			// Raw scit + mushroom + almond water + onion. Milder and cheaper than the royal
+			// version, so a shorter withdrawal with a lower cap.
+			new Meal(
+					"dried_shrimp_mushroom_stew",
+					14, 0.8F,
+					false,
+					3600, 2));
+
+	/** Set once registration has run, so a re-synced registry cannot register everything twice. */
+	private static boolean registered;
 
 	private ModItems() {
 	}
@@ -84,7 +90,7 @@ public final class ModItems {
 		MobEffect mothPheromone = BuiltInRegistries.MOB_EFFECT.get(MOTH_PHEROMONE_ID);
 
 		if (mothPheromone != null) {
-			createStew(mothPheromone);
+			registerMeals(mothPheromone);
 			return;
 		}
 
@@ -95,40 +101,71 @@ public final class ModItems {
 
 		RegistryEntryAddedCallback.event(BuiltInRegistries.MOB_EFFECT).register((rawId, id, effect) -> {
 			if (MOTH_PHEROMONE_ID.equals(id)) {
-				createStew(effect);
+				registerMeals(effect);
 			}
 		});
 	}
 
-	/**
-	 * Builds and registers the stew, now that every effect it needs exists.
-	 *
-	 * <p>Guarded against running twice, because a registry can be re-synced and fire the callback
-	 * again.
-	 */
-	private static void createStew(MobEffect mothPheromone) {
-		if (royalRationStewedMothJelly != null) {
+	/** Builds and registers every meal, now that the effects they need exist. */
+	private static void registerMeals(MobEffect mothPheromone) {
+		if (registered) {
 			return;
 		}
 
-		royalRationStewedMothJelly = Registry.register(
-				BuiltInRegistries.ITEM,
-				EndlessBackroomsDelight.id(ITEM_PATH),
-				new RoyalRationStewedMothJellyItem(new Item.Properties()
-						.food(new FoodProperties.Builder()
-								.nutrition(NUTRITION)
-								.saturationMod(SATURATION_MODIFIER)
-								.effect(new MobEffectInstance(MobEffects.REGENERATION, EFFECT_DURATION_TICKS, EFFECT_AMPLIFIER), EFFECT_CHANCE)
-								.effect(new MobEffectInstance(MobEffects.SATURATION, SATURATION_DURATION_TICKS, 0), EFFECT_CHANCE)
-								.effect(new MobEffectInstance(mothPheromone, MOTH_PHEROMONE_DURATION_TICKS, 0), EFFECT_CHANCE)
-								.build())
-						.stacksTo(16)
-						.craftRemainder(Items.BOWL)));
+		registered = true;
 
-		// Show it next to the other Farmer's Delight meals.
-		ItemGroupEvents.modifyEntriesEvent(FARMERS_DELIGHT_TAB)
-				.register(entries -> entries.accept(royalRationStewedMothJelly));
+		List<Item> items = new ArrayList<>(MEALS.size());
 
-		EndlessBackroomsDelight.LOGGER.info("Registered {}", EndlessBackroomsDelight.id(ITEM_PATH));
+		for (Meal meal : MEALS) {
+			items.add(Registry.register(
+					BuiltInRegistries.ITEM,
+					EndlessBackroomsDelight.id(meal.path()),
+					meal.create(mothPheromone)));
+		}
+
+		// Show them next to the other Farmer's Delight meals.
+		ItemGroupEvents.modifyEntriesEvent(FARMERS_DELIGHT_TAB).register(entries -> items.forEach(entries::accept));
+
+		items.forEach(item -> EndlessBackroomsDelight.LOGGER.info(
+				"Registered {}", BuiltInRegistries.ITEM.getKey(item)));
+	}
+
+	/**
+	 * Definition of one bowl meal.
+	 *
+	 * @param path                    registry path, without the namespace
+	 * @param nutrition               hunger points to restore
+	 * @param saturationModifier      saturation gained is {@code nutrition * this * 2}
+	 * @param grantsMothPheromone     whether eating it makes deathmoths ignore the player
+	 * @param withdrawalDurationTicks how long the withdrawal lasts after eating
+	 * @param withdrawalMaxAmplifier  highest withdrawal amplifier it can build up to
+	 */
+	private record Meal(
+			String path,
+			int nutrition,
+			float saturationModifier,
+			boolean grantsMothPheromone,
+			int withdrawalDurationTicks,
+			int withdrawalMaxAmplifier) {
+
+		Item create(MobEffect mothPheromone) {
+			FoodProperties.Builder food = new FoodProperties.Builder()
+					.nutrition(nutrition)
+					.saturationMod(saturationModifier)
+					.effect(new MobEffectInstance(MobEffects.REGENERATION, REGEN_TICKS, REGEN_AMPLIFIER), EFFECT_CHANCE)
+					.effect(new MobEffectInstance(MobEffects.SATURATION, SATURATION_TICKS, 0), EFFECT_CHANCE);
+
+			if (grantsMothPheromone) {
+				food.effect(new MobEffectInstance(mothPheromone, MOTH_PHEROMONE_TICKS, 0), EFFECT_CHANCE);
+			}
+
+			return new AddictiveBowlFoodItem(
+					new Item.Properties()
+							.food(food.build())
+							.stacksTo(16)
+							.craftRemainder(Items.BOWL),
+					withdrawalDurationTicks,
+					withdrawalMaxAmplifier);
+		}
 	}
 }
