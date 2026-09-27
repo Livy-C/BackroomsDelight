@@ -40,14 +40,53 @@ repository is unreachable, jars can be placed in `libs/` instead — see [libs/R
 
 ## Development
 
-Building requires **JDK 21 or newer** (Fabric Loom 1.17 needs a Java 21+ runtime); the mod
-itself targets Java 17 bytecode.
+### JDK 21 is required
+
+The build's **launcher JVM** must be Java 21 or newer, because Fabric Loom 1.17 refuses to
+configure on an older JVM:
+
+```
+Could not resolve net.fabricmc:fabric-loom:1.17.21
+> Dependency requires at least JVM runtime version 21. This build uses a Java 17 JVM.
+```
+
+That JVM is whichever one `JAVA_HOME` points at, so set it before building:
+
+```sh
+# Windows
+set JAVA_HOME=D:\Java\temurin-21
+# macOS / Linux
+export JAVA_HOME=/path/to/jdk-21
+```
+
+The mod itself still targets **Java 17 bytecode** (`options.release = 17`); JDK 21 is only what
+runs the build. If Gradle cannot auto-detect a JDK 21, set `java21_home` in `gradle.properties`
+to point at one — `build.gradle` validates the path and says so if it is wrong.
+
+### Making the dev environment work
 
 ```sh
 ./gradlew build          # compile and package
 ./gradlew runClient      # launch a development client
 ./gradlew runServer      # launch a development server
 ```
+
+Before the first `runClient`, unpack Farmer's Delight's Porting Lib dependency:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/unpack-porting-lib.ps1
+```
+
+Without it, the game dies during startup with
+`No enum constant RecipeBookType.FARMERSDELIGHT_COOKING`. This is a Loom limitation, not a mistake
+in your setup, and it does **not** affect production — see [libs/README.md](libs/README.md) for the
+full explanation.
+
+`runServer` additionally cannot work with this dependency set: Porting Lib registers its recipe
+book category through a **client-only** mixin, while Farmer's Delight's initializer reads that
+enum on both sides. The server therefore fails the same way even with Porting Lib unpacked. Use
+`runClient` for development, and note that a dedicated server needs a different Farmer's Delight
+or Porting Lib build.
 
 The built jar is written to `build/libs/`.
 
@@ -58,9 +97,11 @@ page for your IDE.
 
 ```
 src/main/java/neo/livy/elbkrdelight/                 common (server + client) code
+src/main/java/neo/livy/elbkrdelight/item/            items and their registration
 src/client/java/neo/livy/elbkrdelight/client/       client-only code
-src/main/resources/                                 fabric.mod.json, assets
-libs/                                               optional local dependency jars
+src/main/resources/                                 fabric.mod.json, assets, data (recipes)
+libs/                                               local dependency jars (gitignored)
+tools/                                              helper scripts for this project
 ```
 
 The mod id is `endless_backrooms_delight`; the Java package root is `neo.livy.elbkrdelight`.
@@ -70,6 +111,14 @@ Mixins use Fabric Loom's split source sets: common mixins belong in
 `src/client/java/neo/livy/elbkrdelight/client/mixin/`. Add the corresponding
 `endless_backrooms_delight.mixins.json` / `endless_backrooms_delight.client.mixins.json`
 configs and reference them from the `mixins` array in `fabric.mod.json` when you add the first one.
+
+### A note on registering content
+
+Endless Backrooms registers its effects lazily (Porting Lib's `LazyRegistrar`), so anything that
+needs one of its effects must be prepared for the effect not to exist yet during this mod's
+initializer. `ModItems` shows the pattern: look the effect up directly, and fall back to
+`RegistryEntryAddedCallback` if it is missing. Note that the callback only fires for entries added
+*after* it is registered, so it cannot be the only path.
 
 ## License
 
