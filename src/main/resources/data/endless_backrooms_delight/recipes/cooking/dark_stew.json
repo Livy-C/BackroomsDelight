@@ -1,0 +1,29 @@
+{
+  "type": "farmersdelight:cooking",
+  "cookingtime": 300,
+  "experience": 1.5,
+  "ingredients": [
+    {
+      "item": "endless_backrooms:corruption_liquid"
+    },
+    {
+      "tag": "endless_backrooms:almond_water"
+    },
+    {
+      "item": "endless_backrooms:level_zero_carpet"
+    },
+    {
+      "item": "endless_backrooms:level_zero_wallpaper"
+    },
+    {
+      "tag": "c:crops/onion"
+    },
+    {
+      "item": "farmersdelight:minced_beef"
+    }
+  ],
+  "recipe_book_tab": "meals",
+  "result": {
+    "item": "endless_backrooms_delight:dark_stew"
+  }
+}

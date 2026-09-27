@@ -128,23 +128,28 @@ page for your IDE.
 
 ## Content
 
-Four items. The three bowl meals stack to 16 and leave an empty bowl behind; fried carpet is a
+Five items. The four bowl meals stack to 16 and leave an empty bowl behind; fried carpet is a
 hand-held snack with nothing left over. Meal definitions live in one place, the `MEALS` list in
 `ModItems`.
 
-| Item                             | Made in        | Recipe                                              | Nutrition | Effects                                                   |
-| -------------------------------- | -------------- | --------------------------------------------------- | --------- | --------------------------------------------------------- |
-| Royal Ration Stewed Moth Jelly   | cooking pot    | royal rations + moth jelly + sugar                   | 30        | Regeneration II 10s, Saturation 15s, Moth Pheromone 5min   |
-| Dried Shrimp Mushroom Stew       | cooking pot    | raw scit + mushroom + almond water + onion           | 14        | Regeneration II 10s, Saturation 15s                        |
-| Carrot Blue Almond Water Stew    | cooking pot    | carrot + blue almond water                           | 12        | Night Vision 3min                                          |
-| Fried Carpet                     | skillet        | Level 0 carpet                                       | 4         | none - it is a greasy snack, not a meal                    |
+| Item                             | Made in        | Recipe                                                        | Nutrition | Effects                                                    |
+| -------------------------------- | -------------- | ------------------------------------------------------------- | --------- | ---------------------------------------------------------- |
+| Royal Ration Stewed Moth Jelly   | cooking pot    | royal rations + moth jelly + sugar                             | 30        | Regeneration II 10s, Saturation 15s, Moth Pheromone 5min    |
+| Dark Stew                        | cooking pot    | corruption liquid + almond water + carpet + wallpaper + onion + minced beef | 16 | Regeneration II 10s, Saturation 15s, **Darkness 15s**, **Nausea 10s** |
+| Dried Shrimp Mushroom Stew       | cooking pot    | raw scit + mushroom stew + almond water + onion                 | 14        | Regeneration II 10s, Saturation 15s                         |
+| Carrot Blue Almond Water Stew    | cooking pot    | carrot + blue almond water                                     | 12        | Night Vision 3min                                           |
+| Fried Carpet                     | skillet        | Level 0 carpet                                                 | 4         | none - it is a greasy snack, not a meal                     |
 
-All four are addictive, matching Endless Backrooms' own royal rations and moth jelly: every serving
+Dark Stew is the one genuine trade in the set: six ingredients, the highest nutrition here, and it
+then takes your sight away for fifteen seconds. It is the only item that inflicts a debuff.
+
+All five are addictive, matching Endless Backrooms' own royal rations and moth jelly: every serving
 raises the withdrawal amplifier one step, capped, and refreshes its duration.
 
 | Item                            | Withdrawal duration | Cap |
 | ------------------------------- | ------------------- | --- |
 | Royal Ration Stewed Moth Jelly  | 6 minutes           | IV  |
+| Dark Stew                       | 6 minutes           | IV  |
 | Dried Shrimp Mushroom Stew      | 3 minutes           | III |
 | Carrot Blue Almond Water Stew   | 3 minutes           | III |
 | Fried Carpet                    | 90 seconds          | II  |

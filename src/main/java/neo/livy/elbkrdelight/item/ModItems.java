@@ -48,6 +48,15 @@ public final class ModItems {
 	/** Night vision from blue almond water. Three minutes, long enough to cross a dark level. */
 	private static final int NIGHT_VISION_TICKS = 3600;
 
+	/**
+	 * The dark stew's own effect: the room goes dark around the eater. Vanilla's own darkness, the
+	 * one the Warden inflicts, so it is a real handicap rather than a flavour text.
+	 */
+	private static final int DARKNESS_TICKS = 300;
+
+	/** Brief nausea, the "that was a mistake" beat that follows eating something rotten. */
+	private static final int NAUSEA_TICKS = 200;
+
 	/** Chance the effects are applied, from 0.0 to 1.0. */
 	private static final float EFFECT_CHANCE = 1.0F;
 
@@ -83,7 +92,15 @@ public final class ModItems {
 			// Carrot + blue almond water. The blue bottle is the one that sees in the dark, so the
 			// stew grants night vision.
 			new Meal("carrot_blue_almond_water_stew", 12, 0.6F, 3600, 2, ignored -> List.of(
-					effect(MobEffects.NIGHT_VISION, NIGHT_VISION_TICKS, 0))));
+					effect(MobEffects.NIGHT_VISION, NIGHT_VISION_TICKS, 0))),
+			// Corruption liquid + almond water + carpet + wallpaper + onion + minced beef. Six
+			// ingredients, the most any of these meals uses, and the only one that is a genuine
+			// trade: it hands out the strongest meal in the mod and then takes your sight away.
+			new Meal("dark_stew", 16, 1.0F, 7200, 3, ignored -> List.of(
+					effect(MobEffects.REGENERATION, REGEN_TICKS, REGEN_AMPLIFIER),
+					effect(MobEffects.SATURATION, SATURATION_TICKS, 0),
+					effect(MobEffects.DARKNESS, DARKNESS_TICKS, 0),
+					effect(MobEffects.CONFUSION, NAUSEA_TICKS, 0))));
 
 	/**
 	 * Fried carpet: an edible repurposing of Level 0's flooring. Deliberately gives no beneficial
