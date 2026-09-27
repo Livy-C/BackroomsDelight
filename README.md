@@ -63,6 +63,24 @@ The mod itself still targets **Java 17 bytecode** (`options.release = 17`); JDK 
 runs the build. If Gradle cannot auto-detect a JDK 21, set `java21_home` in `gradle.properties`
 to point at one — `build.gradle` validates the path and says so if it is wrong.
 
+### If the wrapper cannot download Gradle
+
+On a network that intercepts TLS, the wrapper fails with `PKIX path building failed` before Gradle
+even starts, because it downloads its own distribution. Either add the intercepting root CA to the
+JDK truststore, or point the wrapper at a mirror **locally without committing it**:
+
+```sh
+git update-index --skip-worktree gradle/wrapper/gradle-wrapper.properties
+# then edit distributionUrl in that file
+```
+
+`git update-index --no-skip-worktree` undoes that. The committed value stays on the official
+`services.gradle.org` URL on purpose: pointing a public repository at a third-party mirror makes
+every fresh clone depend on that mirror staying up and staying in sync.
+
+Once Gradle has run once, the distribution is cached in `~/.gradle/wrapper/dists` and the wrapper
+no longer downloads it.
+
 ### Making the dev environment work
 
 ```sh
