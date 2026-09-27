@@ -148,9 +148,11 @@ jelly is one of its ingredients.
 > version's 30 nutrition is partly wasted when eaten from low hunger; the extra shows up as
 > saturation instead, which is clamped separately.
 
-Item textures are placeholders: both models point at `endless_backrooms_delight:item/mushroom_stew`,
-a copy of the vanilla mushroom stew texture living in this mod's own assets folder. Replace that
-file, or repoint each model's `layer0`, when real art is ready.
+Textures live in this mod's own assets folder under `textures/item/`. The royal version has its
+own art, `royal_ration_stewed_moth_jelly.png`. The shrimp version still points at
+`endless_backrooms_delight:item/mushroom_stew`, a copy of the vanilla mushroom stew texture that is
+serving as a placeholder; replace that file or repoint its model's `layer0` when real art is ready.
+Both are 16x16.
 
 ## Layout
 
